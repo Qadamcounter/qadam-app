@@ -1,0 +1,58 @@
+name: Build Qadam APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the project files
+        uses: actions/checkout@v4
+
+      - name: Unzip the app project
+        run: unzip -o qadam-app.zip -d proj
+
+      - name: Install Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Create the Android project shell
+        run: flutter create --platforms=android --project-name qadam_step_counter --org com.qadam scaffold
+
+      - name: Copy our app into the shell
+        run: |
+          cp proj/qadam-app/lib/main.dart scaffold/lib/main.dart
+          cp proj/qadam-app/pubspec.yaml scaffold/pubspec.yaml
+          mkdir -p scaffold/assets
+          cp -r proj/qadam-app/assets/audio scaffold/assets/
+          cp -r proj/qadam-app/assets/icon scaffold/assets/
+          cp proj/qadam-app/override/AndroidManifest.xml scaffold/android/app/src/main/AndroidManifest.xml
+
+      - name: Download packages
+        working-directory: scaffold
+        run: flutter pub get
+
+      - name: Generate launcher icons (ok if this step fails)
+        working-directory: scaffold
+        run: flutter pub run flutter_launcher_icons
+        continue-on-error: true
+
+      - name: Build the APK
+        working-directory: scaffold
+        run: flutter build apk --release
+
+      - name: Save the APK for download
+        uses: actions/upload-artifact@v4
+        with:
+          name: qadam-apk
+          path: scaffold/build/app/outputs/flutter-apk/app-release.apk
