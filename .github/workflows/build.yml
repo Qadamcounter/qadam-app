@@ -29,10 +29,6 @@ jobs:
 
       - name: Create the Android project shell
         run: flutter create --platforms=android --project-name qadam_step_counter --org com.qadam scaffold
-              - name: Force Kotlin 2.1 for new plugins
-                      run: |
-                                if grep -q 'org.jetbrains.kotlin.android' scaffold/android/settings.gradle; then sed -i -E 's/(org\.jetbrains\.kotlin\.android" version ")[^"]+(")/\12.1.0\2/' scaffold/android/settings.gradle; fi
-                                          grep -n kotlin scaffold/android/settings.gradle || true
 
       - name: Copy our app into the shell
         run: |
