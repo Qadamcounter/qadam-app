@@ -32,7 +32,7 @@ jobs:
 
       - name: Copy our app into the shell
         run: |
-          cp proj/qadam-app/lib/main.dart scaffold/lib/main.dart
+          cp -r proj/qadam-app/lib/. scaffold/lib/
           cp proj/qadam-app/pubspec.yaml scaffold/pubspec.yaml
           mkdir -p scaffold/assets
           cp -r proj/qadam-app/assets/audio scaffold/assets/
